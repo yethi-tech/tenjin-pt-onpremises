@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-jmeter-master
+  labels:
+    app: {{ .Release.Name }}-jmeter-master
+spec:
+  type: {{ .Values.Master.service.type | default "ClusterIP" }}  # Ensure this is set in values.yaml
+  selector:
+    app: {{ .Release.Name }}-jmeter-master
+  ports:
+    - name: rmi
+      port: 1099
+      targetPort: 1099
+      protocol: TCP
+    - name: communication
+      port: 60000
+      targetPort: 60000
+      protocol: TCP

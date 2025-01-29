@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-influxdb
+  labels:
+    name: {{ .Release.Name }}-influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-influxdb
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-influxdb
+    spec:
+      containers:
+        - name: influxdb
+          image: {{ .Values.InfluxDB.image | default "influxdb:2.7" }}
+          ports:
+            - containerPort: 8086
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu:  "500m"
+          volumeMounts:
+            - name: influxdb-storage
+              mountPath: /var/lib/influxdb2
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-influxdb-config
+      volumes:
+        - name: influxdb-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-influxdb-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-influxdb-pvc
+  labels:
+    app: {{ .Release.Name }}-influxdb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.InfluxDB.persistence.size | default "5Gi" }}
+  storageClassName: {{ .Values.InfluxDB.persistence.storageClassName | default "standard" }}

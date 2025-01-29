@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-jmeter-vts
+  labels:
+    name: {{ .Release.Name }}-jmeter-vts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-jmeter-vts
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-jmeter-vts
+    spec:
+      containers:
+        - name: jmeter-vts
+          image: performancetesting/opentext_vts_linux_ubuntu:24.3
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          env:
+            - name: VTS_HOST
+              value: "0.0.0.0"
+            - name: VTS_PORT
+              value: "8080"

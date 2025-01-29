@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-jmeter-worker
+  labels:
+    name: {{ .Release.Name }}-jmeter-worker
+spec:
+  serviceName: {{ .Release.Name }}-jmeter-worker
+  replicas: {{ .Values.Workers.replicaCount | default "3" }} # Number of JMeter workers
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-jmeter-worker
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-jmeter-worker
+    spec:
+      containers:
+        - name: jmeter-worker
+          image: {{ .Values.Workers.image | default "yethitech/performance-testing:latest" }}
+          imagePullPolicy: Always
+          env:
+            - name: HEAP
+              value: {{ .Values.Workers.heap | default "-Xms1g -Xmx4g" }}
+          ports:
+            - containerPort: 1099 # JMeter RMI port
+            - containerPort: 60000 # JMeter worker communication
+          volumeMounts:
+            - name: worker-data
+              mountPath: /csv  # Mounting CSV files from PV
+          args: ["-s", "-Dserver.rmi.ssl.disable=true"]
+  volumeClaimTemplates:
+    - metadata:
+        name: worker-data
+        labels:
+          app: {{ .Release.Name }}-jmeter-worker
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.Workers.persistence.size | default "5Gi" }} # Size from values.yaml
+        storageClassName: {{ .Values.Workers.persistence.storageClassName | default "standard" }} # Storage class from values.yaml

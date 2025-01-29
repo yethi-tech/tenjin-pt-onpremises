@@ -1,0 +1,43 @@
+Workers:
+  replicaCount: 3 # Number of JMeter slave replicas
+  image: "yethitech/performance-testing:latest" # Docker image for JMeter slaves
+  heap: "-Xms1g -Xmx4g" # JVM heap size for JMeter slaves
+  persistence:
+    size: "5Gi" # Storage size for each slave replica
+    storageClassName: "standard" # Storage class for Persistent Volume Claims
+Master:
+  image: "yethitech/performance-testing:kube" # Docker image for JMeter master
+  heap: "-Xms1g -Xmx4g" # JVM heap size for JMeter master
+  resources:
+    requests:
+      memory: "5Gi" # Memory request for JMeter master
+      cpu: "1" # CPU request for JMeter master
+    limits:
+      memory: "5Gi" # Memory limit for JMeter master
+      cpu: "3" # CPU limit for JMeter master
+  service:
+    type: ClusterIP
+  persistence:
+    size: "5Gi" # Size for PVC
+    storageClassName: "standard" # Storage class for PVC
+Grafana:
+  username: admin # Grafana admin username
+  password: admin123 # Grafana admin password
+  service:
+    type: ClusterIP # Options: ClusterIP, NodePort, LoadBalancer
+    port: 3000 # External port for accessing Grafana
+  persistence:
+    enabled: true
+    size: 5Gi # Size of the persistent volume
+    storageClassName: standard # Storage class for PVC
+InfluxDB:
+  username: "admin" # InfluxDB admin username
+  password: "Admin@123" # InfluxDB admin password
+  org: "jmeter" # Organization name for InfluxDB
+  bucket: "jmeter" # Bucket name for storing data
+  retention: "30d" # Data retention period
+  persistence:
+    size: "10Gi"
+    storageClassName: "standard"
+  service:
+    type: ClusterIP
