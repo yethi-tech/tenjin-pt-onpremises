@@ -3,12 +3,22 @@ entries:
   performance-testing:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-01-29T18:28:13.6047683+05:30"
+    created: "2025-01-29T19:00:21.1188023+05:30"
     description: A Helm chart for Kubernetes
-    digest: 6d760c8d8ece186259bc2bc42f3f429514eead107e61e4b5eac25dadf03cd5e5
+    digest: f1957500e48fdcacb7ad9deb48b9aa9166741274ed354ec68d0c604a21d99a43
+    name: performance-testing
+    type: application
+    urls:
+    - https://yethii-tech.github.io/tenjin-pt-onpremises/version-0.1.1/performance-testing-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-01-29T19:00:21.1172435+05:30"
+    description: A Helm chart for Kubernetes
+    digest: 7b272b70bd8c8953a4b9d33a5bdf89696f212962ef31ea318f8c36250417dfbc
     name: performance-testing
     type: application
     urls:
     - https://yethii-tech.github.io/tenjin-pt-onpremises/performance-testing-0.1.0.tgz
     version: 0.1.0
-generated: "2025-01-29T18:28:13.602767+05:30"
+generated: "2025-01-29T19:00:21.1151061+05:30"
