@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: influxdb
+      app: {{ .Release.Name }}-influxdb
   template:
     metadata:
       labels:
-        app: influxdb
+        app: {{ .Release.Name }}-influxdb
     spec:
       containers:
         - name: influxdb
@@ -40,7 +40,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: influxdb-pvc
+  name: {{ .Release.Name }}-influxdb-pvc
   labels:
     app: {{ .Release.Name }}-influxdb
 spec:

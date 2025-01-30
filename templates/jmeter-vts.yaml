@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jmeter-vts
+      app: {{ .Release.Name }}-jmeter-vts
   template:
     metadata:
       labels:
-        app: jmeter-vts
+        app: {{ .Release.Name }}-jmeter-vts
     spec:
       containers:
         - name: jmeter-vts
