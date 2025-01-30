@@ -9,11 +9,11 @@ spec:
   replicas: {{ .Values.Workers.replicaCount | default "3" }} # Number of JMeter workers
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-jmeter-worker
+      app: jmeter-worker
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-jmeter-worker
+        app: jmeter-worker
     spec:
       containers:
         - name: jmeter-worker
@@ -33,7 +33,7 @@ spec:
     - metadata:
         name: worker-data
         labels:
-          app: {{ .Release.Name }}-jmeter-worker
+          app: jmeter-worker
       spec:
         accessModes:
           - ReadWriteOnce

@@ -8,7 +8,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-jmeter-master
+        app: jmeter-master
     spec:
       serviceAccountName: {{ .Release.Name }}-jmeter-master-sa
       restartPolicy: Never  # Required field
@@ -85,7 +85,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-jmeter-master-pv
   labels:
-    app: {{ .Release.Name }}-jmeter-master
+    app: jmeter-master
 spec:
   accessModes:
     - ReadWriteOnce

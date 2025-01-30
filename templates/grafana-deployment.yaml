@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-grafana
+      app: grafana
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-grafana
+        app: grafana
     spec:
       securityContext:
         fsGroup: 472
@@ -51,7 +51,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-grafana-pvc
   labels:
-    app: {{ .Release.Name }}-grafana
+    app: grafana
 spec:
   accessModes:
     - ReadWriteOnce
