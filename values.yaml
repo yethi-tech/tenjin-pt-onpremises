@@ -18,7 +18,7 @@ Master:
   service:
     type: ClusterIP
   persistence:
-    size: "5Gi" # Size for PVC
+    size: "6Gi" # Size for PVC
     storageClassName: "standard" # Storage class for PVC
 Grafana:
   username: admin # Grafana admin username
@@ -28,7 +28,7 @@ Grafana:
     port: 3000 # External port for accessing Grafana
   persistence:
     enabled: true
-    size: 5Gi # Size of the persistent volume
+    size: 2Gi # Size of the persistent volume
     storageClassName: standard # Storage class for PVC
 InfluxDB:
   username: "admin" # InfluxDB admin username
