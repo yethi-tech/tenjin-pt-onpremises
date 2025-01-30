@@ -33,7 +33,7 @@ spec:
     - metadata:
         name: worker-data
         labels:
-          app: jmeter-worker
+          app: {{ .Release.Name }}-jmeter-worker
       spec:
         accessModes:
           - ReadWriteOnce

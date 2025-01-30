@@ -40,9 +40,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-influxdb-pvc
+  name: influxdb-pvc
   labels:
-    app: influxdb
+    app: {{ .Release.Name }}-influxdb
 spec:
   accessModes:
     - ReadWriteOnce

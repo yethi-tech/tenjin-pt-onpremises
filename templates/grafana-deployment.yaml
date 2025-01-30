@@ -49,9 +49,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-grafana-pvc
+  name: grafana-pvc
   labels:
-    app: grafana
+    app: {{ .Release.Name }}-grafana
 spec:
   accessModes:
     - ReadWriteOnce
