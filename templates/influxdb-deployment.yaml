@@ -48,5 +48,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.InfluxDB.persistence.size | default "5Gi" }}
+      storage: {{ .Values.InfluxDB.persistence.size | default "10Gi" }}
   storageClassName: {{ .Values.InfluxDB.persistence.storageClassName | default "standard" }}

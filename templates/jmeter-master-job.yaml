@@ -83,7 +83,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-jmeter-master-pv
+  name: {{ .Release.Name }}-jmeter-master-pvc
   labels:
     app: jmeter-master
 spec:
@@ -91,5 +91,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.Master.persistence.size | default "5Gi" }}  # Templated size from values.yaml
+      storage: {{ .Values.Master.persistence.size | default "6Gi" }}  # Templated size from values.yaml
   storageClassName: {{ .Values.Master.persistence.storageClassName | default "standard" }}  # Templated storage class
