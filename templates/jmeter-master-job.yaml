@@ -1,83 +1,85 @@
 apiVersion: batch/v1
-kind: Job
+kind: CronJob
 metadata:
   name: {{ .Release.Name }}-jmeter-master
   labels:
     name: {{ .Release.Name }}-jmeter-master
 spec:
-  template:
-    metadata:
-      labels:
-        app: {{ .Release.Name }}-jmeter-master
+  schedule: "5 5 5 5 5"  # <-- Update as needed
+  jobTemplate:
     spec:
-      serviceAccountName: {{ .Release.Name }}-jmeter-master-sa
-      restartPolicy: Never  # Required field
-      containers:
-        - name: jmeter-master
-          image: {{ .Values.Master.image | default "yethitech/performance-testing:kube-29-01-25" }}
-          imagePullPolicy: Always
-          env:
-            - name: HEAP
-              value: {{ .Values.Master.heap | default "-Xms1g -Xmx4g" }}
-          ports:
-            - containerPort: 1099
-            - containerPort: 60000
-          volumeMounts:
+      template:
+        metadata:
+          labels:
+            app: {{ .Release.Name }}-jmeter-master
+        spec:
+          serviceAccountName: {{ .Release.Name }}-jmeter-master-sa
+          restartPolicy: Never
+          containers:
+            - name: jmeter-master
+              image: {{ .Values.Master.image | default "yethitech/performance-testing:kube-29-01-25" }}
+              imagePullPolicy: Always
+              env:
+                - name: HEAP
+                  value: {{ .Values.Master.heap | default "-Xms1g -Xmx4g" }}
+              ports:
+                - containerPort: 1099
+                - containerPort: 60000
+              volumeMounts:
+                - name: jmeter-data-volume
+                  mountPath: /csv
+              resources:
+                requests:
+                  memory: {{ .Values.Master.resources.requests.memory | default "5Gi" }}
+                  cpu: {{ .Values.Master.resources.requests.cpu | default "1" }}
+                limits:
+                  memory: {{ .Values.Master.resources.limits.memory | default "5Gi" }}
+                  cpu: {{ .Values.Master.resources.limits.cpu | default "3" }}
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  set -x
+
+                  MAX_RETRIES=2
+                  RETRY_DELAY=5
+
+                  i=0
+                  while [ $i -le $MAX_RETRIES ]; do
+                    SLAVE_IPS=$(kubectl get pods -l app={{ .Release.Name }}-jmeter-worker -o jsonpath='{.items[*].status.podIP}' | tr ' ' ',')
+
+                    if [ -n "$SLAVE_IPS" ]; then
+                      echo "Slave IPs found: $SLAVE_IPS"
+                      break
+                    fi
+
+                    echo "No slave IPs found. Retrying in $RETRY_DELAY seconds... (Attempt $((i+1)) of $((MAX_RETRIES+1)))"
+                    sleep $RETRY_DELAY
+                    i=$((i+1))
+                  done
+
+                  if [ -z "$SLAVE_IPS" ]; then
+                    echo "No slave IPs found! Exiting..."
+                    exit 1
+                  fi
+
+                  jmeter -n -t /csv/Tenjin.jmx \
+                    -R $SLAVE_IPS \
+                    -r \
+                    -Dserver.rmi.ssl.disable=true \
+                    -Jserver.rmi.localport=60000 \
+                    -Jclient.rmi.localport=1099 \
+                    -e -o /csv/reports.html \
+                    -l /csv/results.jtl \
+                    -j /csv/results.log
+
+                  echo "JMeter test execution completed."
+          volumes:
             - name: jmeter-data-volume
-              mountPath: /csv  # Mounting CSV files from PVC
-          resources:
-            requests:
-              memory: {{ .Values.Master.resources.requests.memory | default "5Gi" }}
-              cpu: {{ .Values.Master.resources.requests.cpu | default "1" }}
-            limits:
-              memory: {{ .Values.Master.resources.limits.memory | default "5Gi" }}
-              cpu: {{ .Values.Master.resources.limits.cpu | default "3" }}
-          command:
-            - /bin/sh
-            - -c
-          args:
-            - |
-              set -x  # Enable shell debugging
+              persistentVolumeClaim:
+                claimName: {{ .Release.Name }}-jmeter-master-pv
 
-              # Retry mechanism to fetch IPs of all JMeter slave pods
-              MAX_RETRIES=2  # Number of retries
-              RETRY_DELAY=5  # Delay in seconds between retries
-
-              i=0
-              while [ $i -le $MAX_RETRIES ]; do
-                SLAVE_IPS=$(kubectl get pods -l app={{ .Release.Name }}-jmeter-worker -o jsonpath='{.items[*].status.podIP}' | tr ' ' ',')
-                
-                if [ -n "$SLAVE_IPS" ]; then
-                  echo "Slave IPs found: $SLAVE_IPS"
-                  break
-                fi
-
-                echo "No slave IPs found. Retrying in $RETRY_DELAY seconds... (Attempt $((i+1)) of $((MAX_RETRIES+1)))"
-                sleep $RETRY_DELAY
-              done
-
-              # Exit if no IPs are found
-              if [ -z "$SLAVE_IPS" ]; then
-                echo "No slave IPs found! Exiting..."
-                exit 1
-              fi
-
-              # Run JMeter across all slaves simultaneously
-              jmeter -n -t /csv/Tenjin.jmx \
-                -R $SLAVE_IPS \
-                -r \
-                -Dserver.rmi.ssl.disable=true \
-                -Jserver.rmi.localport=60000 \
-                -Jclient.rmi.localport=1099 \
-                -e -o /csv/reports.html \
-                -l /csv/results.jtl \
-                -j /csv/results.log
-
-              echo "JMeter test execution completed."
-      volumes:
-        - name: jmeter-data-volume
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-jmeter-master-pv
 ---
 # PersistentVolumeClaim definition (dynamic provisioning)
 apiVersion: v1
