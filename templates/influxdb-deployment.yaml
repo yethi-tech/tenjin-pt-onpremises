@@ -50,3 +50,6 @@ spec:
     requests:
       storage: {{ .Values.InfluxDB.persistence.size | default "10Gi" }}
   storageClassName: {{ .Values.InfluxDB.persistence.storageClassName | default "standard" }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-influxdb
