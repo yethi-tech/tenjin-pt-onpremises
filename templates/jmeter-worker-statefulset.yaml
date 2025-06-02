@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: jmeter-worker
-          image: {{ .Values.Workers.image | default "yethitech/performance-testing:29-01-25" }}
+          image: {{ .Values.Workers.image | default "yethitech/performance-testing:3-2-25" }}
           imagePullPolicy: Always
           env:
             - name: HEAP

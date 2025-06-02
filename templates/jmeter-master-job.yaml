@@ -17,7 +17,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: jmeter-master
-              image: {{ .Values.Master.image | default "yethitech/performance-testing:kube-29-01-25" }}
+              image: {{ .Values.Master.image | default "yethitech/performance-testing:kube-3-2-25" }}
               imagePullPolicy: Always
               env:
                 - name: HEAP
